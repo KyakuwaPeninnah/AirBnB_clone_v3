@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-'''states blueprint'''
+'''states module'''
 
 from api.v1.views import app_views
 from flask import jsonify, abort, request, make_response
@@ -10,18 +10,18 @@ from models.state import State
 @app_views.route('/states', methods=['GET'], strict_slashes=False)
 @app_views.route('/states/<state_id>', methods=['GET'], strict_slashes=False)
 def getStates(state_id=None):
-    '''gets all states or state with the id passed'''
+    '''gets all states or state with their id passed'''
     if state_id is None:
-        res = []
+        result = []
         states = storage.all(State)
         for state in states.values():
-            res.append(state.to_dict())
-        return jsonify(res)
+            result.append(state.to_dict())
+        return jsonify(result)
 
-    res = storage.get(State, state_id)
+    result = storage.get(State, state_id)
     if res is None:
         abort(404)
-    return jsonify(res.to_dict())
+    return jsonify(result.to_dict())
 
 
 @app_views.route('/states/<state_id>',
@@ -30,9 +30,9 @@ def getStates(state_id=None):
 def deleteState(state_id=None):
     '''deletes a state'''
     if state_id is not None:
-        res = storage.get(State, state_id)
-        if res is not None:
-            storage.delete(res)
+        result = storage.get(State, state_id)
+        if result is not None:
+            storage.delete(result)
             storage.save()
             return make_response(jsonify({}), 200)
     abort(404)

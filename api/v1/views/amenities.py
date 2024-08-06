@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-'''amenities blueprint'''
+'''amenities module'''
 
 from api.v1.views import app_views
 from flask import jsonify, abort, request, make_response
@@ -9,7 +9,7 @@ from models.amenity import Amenity
 
 @app_views.route('/amenities', methods=['GET'], strict_slashes=False)
 def getamenities():
-    '''get all amenities available'''
+    '''get all amenities'''
     amens = storage.all(Amenity)
     return jsonify([amen.to_dict() for amen in amens.values()])
 
@@ -33,9 +33,9 @@ def getAmenityById(amenity_id=None):
 def deleteAmenity(amenity_id=None):
     '''deletes an amenity'''
     if amenity_id is not None:
-        res = storage.get(Amenity, amenity_id)
+        result = storage.get(Amenity, amenity_id)
         if res is not None:
-            storage.delete(res)
+            storage.delete(result)
             storage.save()
             return make_response(jsonify({}), 200)
     abort(404)
@@ -60,7 +60,7 @@ def postAmenity():
                  methods=['PUT'],
                  strict_slashes=False)
 def updateAmenity(amenity_id=None):
-    '''updates a amenity'''
+    '''updates amenity'''
     if amenity_id is None:
         abort(404)
     obj = storage.get(Amenity, amenity_id)
