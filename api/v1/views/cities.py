@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-'''cities blueprint'''
+'''cities module'''
 
 from api.v1.views import app_views
 from flask import jsonify, abort, request, make_response
@@ -10,27 +10,27 @@ from models.city import City
 
 @app_views.route('/cities/<city_id>', methods=['GET'], strict_slashes=False)
 def getCity(city_id=None):
-    '''get a city with the id'''
+    '''get a city by id'''
     if city_id is None:
         abort(404)
-    ct = storage.get(City, city_id)
-    if ct is None:
+    cty = storage.get(City, city_id)
+    if cty is None:
         abort(404)
-    return jsonify(ct.to_dict())
+    return jsonify(cty.to_dict())
 
 
 @app_views.route('/states/<state_id>/cities',
                  methods=['GET'],
                  strict_slashes=False)
 def getCitiesInState(state_id=None):
-    '''gets all cities in state with the id passed'''
+    '''gets all cities in state with their id passed'''
     if state_id is None:
         abort(404)
-    st = storage.get(State, state_id)
-    if st is None:
+    sty = storage.get(State, state_id)
+    if sty is None:
         abort(404)
-    cts = st.cities
-    return jsonify([ct.to_dict() for ct in cts])
+    ctys = sty.cities
+    return jsonify([cty.to_dict() for cty in ctys])
 
 
 @app_views.route('/cities/<city_id>',
@@ -39,9 +39,9 @@ def getCitiesInState(state_id=None):
 def deleteCity(city_id=None):
     '''deletes a city'''
     if city_id is not None:
-        res = storage.get(City, city_id)
-        if res is not None:
-            storage.delete(res)
+        result = storage.get(City, city_id)
+        if result is not None:
+            storage.delete(result)
             storage.save()
             return make_response(jsonify({}), 200)
     abort(404)
@@ -54,8 +54,8 @@ def postCity(state_id=None):
     '''posts a new city to a specific state'''
     if state_id is None:
         abort(404)
-    st = storage.get(State, state_id)
-    if st is None:
+    sty = storage.get(State, state_id)
+    if sty is None:
         abort(404)
 
     body = request.get_json()

@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-'''places blueprint'''
+'''places module'''
 
 from api.v1.views import app_views
 from flask import jsonify, abort, request, make_response
@@ -17,17 +17,17 @@ def getPlacesInCity(city_id=None):
     '''get all places in a city'''
     if city_id is None:
         abort(404)
-    ct = storage.get(City, city_id)
-    if ct is None:
+    cty = storage.get(City, city_id)
+    if cty is None:
         abort(404)
 
     places = storage.all(Place)
-    res = []
+    result = []
     for place in places.values():
-        if place.city_id == ct.id:
-            res.append(place)
+        if place.city_id == cty.id:
+            result.append(place)
 
-    return jsonify([place.to_dict() for place in res])
+    return jsonify([place.to_dict() for place in result])
 
 
 @app_views.route('/places/<place_id>',
@@ -49,9 +49,9 @@ def getPlaceById(place_id=None):
 def deletePlace(place_id=None):
     '''deletes a place'''
     if place_id is not None:
-        res = storage.get(Place, place_id)
-        if res is not None:
-            storage.delete(res)
+        result = storage.get(Place, place_id)
+        if result is not None:
+            storage.delete(result)
             storage.save()
             return make_response(jsonify({}), 200)
     abort(404)
@@ -64,8 +64,8 @@ def postPlace(city_id):
     '''posts a new place'''
     if city_id is None:
         abort(404)
-    ct = storage.get(City, city_id)
-    if ct is None:
+    cty = storage.get(City, city_id)
+    if cty is None:
         abort(404)
 
     body = request.get_json()
@@ -98,7 +98,7 @@ def placesSearch():
        ('cities' not in keys or len(body['cities']) <= 0)):
         if 'amenities' not in keys:
             places = storage.all(Place).values()
-            dcts = [pl.to_dict() for pl in places]
+            dcts = [plc.to_dict() for plc in places]
             if storage_t == 'db':
                 for idx in range(len(dcts)):
                     if 'amenities' in dcts[idx].keys():
@@ -109,16 +109,16 @@ def placesSearch():
             unwanted = []
             for idx, place in enumerate(places):
                 if storage_t == 'db':
-                    amens_ids = [m.id for m in place.amenities]
+                    amenties_ids = [m.id for m in place.amenities]
                 else:
-                    amens_ids = place.amenity_ids
+                    amenties_ids = place.amenity_ids
                 for amenity_id in body['amenities']:
-                    if amenity_id not in amens_ids:
+                    if amenity_id not in amenties_ids:
                         unwanted.append(idx)
                         break
             for idx, i in enumerate(unwanted):
                 del places[i - idx]
-            dcts = [pl.to_dict() for pl in places]
+            dcts = [plc.to_dict() for plc in places]
             if storage_t == 'db':
                 for idx in range(len(dcts)):
                     if 'amenities' in dcts[idx].keys():
@@ -147,9 +147,9 @@ def placesSearch():
     if 'amenities' in keys:
         for idx, place in enumerate(wanted_places):
             if storage_t == 'db':
-                amens_ids = [m.id for m in place.amenities]
+                amenties_ids = [m.id for m in place.amenities]
             else:
-                amens_ids = place.amenity_ids
+                amenties_ids = place.amenity_ids
             for amenity_id in body['amenities']:
                 if amenity_id not in amens_ids:
                     unwanted.append(idx)
@@ -157,7 +157,7 @@ def placesSearch():
 
     for idx, i in enumerate(unwanted):
         del wanted_places[i - idx]
-    dcts = [pl.to_dict() for pl in wanted_places]
+    dcts = [plc.to_dict() for plc in wanted_places]
     if storage_t == 'db':
         for idx in range(len(dcts)):
             if 'amenities' in dcts[idx].keys():

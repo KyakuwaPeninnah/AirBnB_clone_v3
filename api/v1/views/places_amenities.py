@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-'''places amenities relationship blueprint'''
+'''places amenities relationship module'''
 
 from api.v1.views import app_views
 from flask import jsonify, abort, request, make_response
@@ -16,20 +16,20 @@ def getAmenitiesInPlace(place_id=None):
     '''get all amenities in a place'''
     if place_id is None:
         abort(404)
-    pl = storage.get(Place, place_id)
-    if pl is None:
+    plc = storage.get(Place, place_id)
+    if plc is None:
         abort(404)
 
-    res = []
+    result = []
     if storage_t != 'db':
-        amens = storage.all(Amenity)
-        for amen in amens.values():
-            if amen.id in pl.amenity_ids:
-                res.append(amen)
+        amenties = storage.all(Amenity)
+        for amenty in amenties.values():
+            if amenty.id in plc.amenity_ids:
+                result.append(amenty)
     else:
-        res = pl.amenities
+        result = plc.amenities
 
-    return jsonify([amen.to_dict() for amen in res])
+    return jsonify([amenty.to_dict() for amenty in result])
 
 
 @app_views.route('/places/<place_id>/amenities/<amenity_id>',
